@@ -1,4 +1,4 @@
-# Syna.esth.esia
+# Syna.esth.etic
 
 Glitch images by applying sound effects.
 

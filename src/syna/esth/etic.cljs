@@ -1,4 +1,4 @@
-(ns syna.esth.esia
+(ns syna.esth.etic
   (:refer-clojure :exclude [delay *out*])
   (:require [clojure.string :as str]
             [syna.esth.proc :refer [cmd!]]
@@ -66,21 +66,3 @@
 
                       ;; and write it out
                       out)))))))
-
-
-;; Elisp stuff
-
-#_
-(make-local-variable 'after-save-hook)
-#_
-(setq after-save-hook
-      (lambda ()
-              (interactive)
-              (shell-command "/home/arne/opt/bin/synaesthesia /home/arne/clj-projects/synaesthesia/jwcserai.jpg")
-              (with-current-buffer (get-buffer "output.png")
-                (revert-buffer t t))))
-
-
-
-#_
-(setenv "SYNAESTHESIA_HOME" "/home/arne/clj-projects/synaesthesia")

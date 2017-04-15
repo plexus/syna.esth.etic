@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+export SYNAESTHETIC_HOME="${SYNAESTHETIC_HOME:-$(npm -g root)/synaesthetic}"
+export NODE_PATH="${SYNAESTHETIC_HOME}/node_modules"
+
+exec "${NODE_PATH}/lumo-cljs/bin/lumo" -c "${SYNAESTHETIC_HOME}/src" -m syna.esth.etic "$@"

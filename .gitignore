@@ -1,3 +1,4 @@
 *.log
 *.jpg
 *.png
+node_modules

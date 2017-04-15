@@ -1,9 +1,9 @@
 {
-  "name": "synaesthesia",
+  "name": "synaesthetic",
   "version": "0.0.0",
   "description": "Glitch images with sound effects",
   "bin": {
-    "synaesthesia": "bin/synaesthesia"
+    "synaesthetic": "bin/synaesthetic"
   },
   "keywords": [
     "glitch",
@@ -13,16 +13,16 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:plexus/synaesthesia.git"
+    "url": "git@github.com:plexus/synaesthetic.git"
   },
   "author": "Plexus",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bugs": {
-    "url": "https://github.com/plexus/synaesthesia/issues"
+    "url": "https://github.com/plexus/synaesthetic/issues"
   },
-  "homepage": "https://github.com/plexus/synaesthesia",
+  "homepage": "https://github.com/plexus/synaesthetic",
   "dependencies": {
     "lumo-cljs": "1.3.0"
   },

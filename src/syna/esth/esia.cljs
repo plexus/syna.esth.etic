@@ -1,33 +1,86 @@
-#!/usr/bin/env lumo
-;; -*- clojurescript -*-
 (ns syna.esth.esia
-  (:require [lumo.core :refer [*command-line-args*]]
-            [lumo.util :refer [debug-prn]]
-            [clojure.string :as str]
+  (:refer-clojure :exclude [delay *out*])
+  (:require [clojure.string :as str]
             [syna.esth.proc :refer [cmd!]]
-            [syna.esth.strm :refer [|
-                                    pass-through-stream
-                                    file-read-stream
-                                    file-write-stream
-                                    split-stream
-                                    concat-streams]]))
+            [syna.esth.strm
+             :refer [|
+                     dbg
+                     pass-through-stream
+                     <file
+                     >file
+                     split-stream
+                     stream-concat
+                     truncate
+                     sponge
+                     buffer-size]]
+            [syna.esth.sox :refer [sox dcshift delay echos bass treble bandreject fir]]))
+
+(def *err* js/process.stderr)
+(def *in* js/process.stdin)
+(def *out* js/process.stdout)
+
+(def sox-args
+  (-> (sox {:channels 20 :depth 8})
+      (conj "delay")
+      (into (range 20))
+      #_(fir 1 0.8)
+      (treble 4)
+      #_(echos 0.7 0.8 250 0.4)
+      #_(dcshift 0.2)))
 
 
-(def sox-args (str/split "sox -r 44100 -b 32 -c 5 -e unsigned-integer -t raw - -t raw - delay 0 0s 0 7s 0" " "))
+(defn -main [infile outfile]
+  (let [in            (if infile (<file infile) *in*)
+        img->bmp      (cmd! ["convert" "-" "bmp:-"])
+        bmp->png      (cmd! ["convert" "bmp:-" "png:-"])
+        sox           (cmd! sox-args)
+        out           (if outfile (>file outfile) *out*)]
 
-(defn -main [infile]
-  (let [instream    (file-read-stream infile)
-        to-bmp      (cmd! ["convert" "-" "bmp:-"])
-        to-png      (cmd! ["convert" "bmp:-" "png:-"])
-        sox         (cmd! sox-args)
-        [head body] (split-stream to-bmp 1000)
+    (| (:err to-bmp) *err*)
+    (| (:err sox) *err*)
 
-        out-file    (file-write-stream "output.png")]
+    (| in
 
-    (| (:err to-bmp) (file-write-stream "convert-error.log"))
-    (| (:err sox) (file-write-stream "sox-error.log"))
+       ;; Turn the image into an uncompressed bitmap, can't do much with it otherwise
+       img->bmp
 
-    (| instream to-bmp)
-    (| body sox)
+       ;; Soak up the whole input, because we need to know the size of the BMP image
+       (sponge (fn [bmp]
+                 (let [bmp-size (buffer-size bmp)
 
-    (| (concat-streams head sox) to-png out-file)))
+                       ;; chop off the header, the header needs to stay intact,
+                       ;; with the rest you can mess as much as you like
+                       [head body] (split-stream bmp 1000)]
+
+                   ;; pipe the rest of the image to sox, this is where the *magic* happens
+                   (| body sox)
+
+                   ;; now add the head and processed body together again
+                   (| (stream-concat head sox)
+                      ;; The size might have changed so "truncate" (this can
+                      ;; either cut off bits, or pad the result with nulls)
+                      (truncate bmp-size)
+
+                      ;; finally convert back to something sensible
+                      bpm->png
+
+                      ;; and write it out
+                      out)))))))
+
+
+;; Elisp stuff
+
+#_
+(make-local-variable 'after-save-hook)
+#_
+(setq after-save-hook
+      (lambda ()
+              (interactive)
+              (shell-command "/home/arne/opt/bin/synaesthesia /home/arne/clj-projects/synaesthesia/jwcserai.jpg")
+              (with-current-buffer (get-buffer "output.png")
+                (revert-buffer t t))))
+
+
+
+#_
+(setenv "SYNAESTHESIA_HOME" "/home/arne/clj-projects/synaesthesia")

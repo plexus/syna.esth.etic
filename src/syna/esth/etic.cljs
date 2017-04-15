@@ -20,12 +20,10 @@
 (def *out* js/process.stdout)
 
 (def sox-args
-  (-> (sox {:channels 20 :depth 8})
-      (conj "delay")
-      (into (range 20))
-      #_(fir 1 0.8)
+  (-> (sox {:channels 2 :depth 8})
+      (fir 1 0.8)
       (treble 4)
-      #_(echos 0.7 0.8 250 0.4)
+      (echos 0.7 0.8 250 0.4)
       #_(dcshift 0.2)))
 
 
@@ -36,7 +34,8 @@
         sox           (cmd! sox-args)
         out           (if outfile (>file outfile) *out*)]
 
-    (| (:err to-bmp) *err*)
+    (| (:err img->bmp) *err*)
+    (| (:err bmp->png) *err*)
     (| (:err sox) *err*)
 
     (| in
@@ -62,7 +61,7 @@
                       (truncate bmp-size)
 
                       ;; finally convert back to something sensible
-                      bpm->png
+                      bmp->png
 
                       ;; and write it out
                       out)))))))

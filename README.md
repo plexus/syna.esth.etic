@@ -5,6 +5,8 @@
 C̸͉̤͖̪̙̹͇͈̺̩̓̿̆̌͛͛̐̎̐͒̋̕͘͜͠o̷̧̢̯̰͖̻̺̹̦͚͍̩̾m̴̛͍̱̽m̷̯̜̭̠͇͖̣͔̾ạ̴̢͓̜͇͇͇̯̝̣̭̼̋͆̊ņ̵̛̘̪̝͚͖͇̰̜̣̄̄͐̓͒̇͘̚ď̴͕̹̈́͆̉̏̉͛͆̄̋̀̀̈́̆͜͝ ̴̡̡͕̟̯̲̮͈̟̜͍̤̝̅̏̚ͅL̸̨̬̻̲͙͍̖̜̝̜̭͚̺͍͙̂̍̄̈͐̔͛̊̀i̴̡̙͈̠̭͓̲̲̭̬̝͎̲͐̉̓̅̌̏͂ṅ̴̡̧̡̻͚̜͓͕͕̮͍̽̋̂̑́͋́̚͘͝͝ê̸̲͕̱̼̦̅̐͑͗͊̓̓̒̑̚̚ ̷̣̺̄͘Ǧ̴̹̫͕̙̩̖͍͙͎̤̖̙̳̗̳̒̑̌͐̐̑̆͋̆͊̈̓̏l̶̦̺̟͔̹̍̂̋̈́͠ĩ̷̛͕̖̝̣̒͑̌̌̒͝ͅt̷̡̛̺͓̭͕̾̋͑̾͋͝c̴̡̘̟͇̝͕̙͔̱̟͖̺̹͕̓́̿̊̈́̌͋͌̌h̸̛̞̉̉͊̐̒̅̆̓̎͌͝ȅ̸̜̰̺̗̻̻̦͍̗̬̻͍̩͇̯̿͋r̷̛̤̜͇̠̻̟͓͉̃̋́͂̓̅̍́͂͗̄͂̕ ̵̭͓̟̔͑͌͆̽͛̒͛̊̕̚͜͝͝͝Ę̷̙̝̪͕͖̘̯̘̱̐̏͂͊x̷̡̡͙̳̻̝̥̲͚̓̎͗͌́̓̂͂̅̀̋̐̏͝t̴̻̖͎͕͕͎̣̱̄́̇̓͌͊̀̑̓̿̏͝r̴̖̘̠͔̳̲͎̫̬̘͎̰̈͗̈́̆a̵̡͍̝͍̟̘̙̗̘̼͆͋o̸͍̝̤͓̭̣͙̣͍̘̹͓̅̌̓̈́̀́̈́̅͝r̴̢͕̬̻͖̆d̵̢͓̣̟͈̱̈́̐͋͠ị̵̖̭͈̻̰̦̜̃̊͐͐̈́͐̄ņ̴͖̦͉̠̤̲̬̭̲̞̮̱͆̆̀̀̎͗͌͂̌̈́̃̓͋͜ã̷̹͕̲̘̞̼̠͓͙̩̮͙͇̤͛̅́į̵̧̟̠͕͓͕̻̮̰͓̫̾̄r̸̭̩̦̉̃́̈̈́̀̔̒̏̈̓͘̚e̵̢̢̖̻̣͓̟͎̤̦̓̀̆͛̒͛͗͐̈͂̈́̐̎ͅ
 <br>
 <br>
+<br>
+<br>
 
 Process images with the SoX, the Swiss Army knife of audio manipulation.
 
@@ -47,7 +49,9 @@ synaesthetic infile.jpg outfile.png treble +20 echoes 0.7 0.8 10s 1 11s 1 dcshif
 
 ## Scripted use
 
-You can write scripts in ClojureScript for more advanced uses, see the examples/ directory for some examples.
+You can write scripts in ClojureScript for more advanced uses, see the
+[examples/](https://github.com/plexus/syna.esth.etic/tree/master/examples)
+directory for some examples.
 
 ``` clojurescript
 ;; your_script.cljs
@@ -58,7 +62,7 @@ You can write scripts in ClojureScript for more advanced uses, see the examples/
      (dcshift 0.2))
 ```
 
-The `syna.esth.sox` namespaces contains a bunch of functions you can use. Pass your script in with the `-s` flag.
+The [`syna.esth.sox` namespace](https://github.com/plexus/syna.esth.etic/blob/master/src/syna/esth/sox.cljs) contains a bunch of functions you can use. Pass your script in with the `-s` flag.
 
 ```
 synaesthetic -s your_script.cljs infile.jpg outfile.png
@@ -72,10 +76,6 @@ workflow.
 ## Pipes
 
 You can use `-` as a file name to either read from stdout, or write to stdout.
-
-
-
-
 
 ## Author
 

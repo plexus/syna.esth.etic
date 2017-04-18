@@ -112,7 +112,7 @@
 (def GLITCHING ["—" "—" "—" "Ḡ̶̲̻" "L̴̓̊ͅ" "Ȉ̸̩͘" "T̸̯̟͊̿" "C̷͚̳̱̔" "H̷̡̬̣̎" "I̸̕ͅ" "N̴̯̠̯̚" "G̴̢̡͜͝" "—" "—" "—"])
 
 (defn BANNER! []
-  (println (str/join " " GLITCHING))
+  (println (str/join "" GLITCHING))
   (println)
   (let [pos (atom 0)
         timeout (js/setInterval (fn [& args]
@@ -141,25 +141,26 @@
       (println-err "FATAL: Failed to run convert. Make sure you have ImageMagick installed. Try running convert --version."))))
 
 (defn -main [& args]
-  (check-sox!)
-  (check-convert!)
-  (let [stop-banner (atom (BANNER!))
-        {:keys [options arguments]} (parse-opts args cli-options :in-order true)]
+  (let [{:keys [options arguments]} (parse-opts args cli-options :in-order true)]
     (if (or (:help options) (empty? arguments))
       (println-err help)
-      (let [infile (first arguments)
-            outfile (second arguments)
-            script (:script options)
-            run-sox (fn [sox-proc]
-                      (.on (:out sox-proc) "end" @stop-banner)
-                      (| (:err sox-proc) *err*)
-                      (run-pipeline infile outfile sox-proc))]
-        (if script
-          (do
-            (run-script script run-sox)
-            (when (:watch options)
-              (println "Watching" script "for changes.")
-              (.watch node-fs script (fn [_ _]
-                                       (reset! stop-banner (BANNER!))
-                                       (run-script script run-sox)))))
-          (run-sox (sox {:channels 2 :depth 8} (drop 2 arguments))))))))
+      (do
+        (let [stop-banner (atom (BANNER!))
+              infile (first arguments)
+              outfile (second arguments)
+              script (:script options)
+              run-sox (fn [sox-proc]
+                        (.on (:out sox-proc) "end" @stop-banner)
+                        (| (:err sox-proc) *err*)
+                        (run-pipeline infile outfile sox-proc))]
+          (check-sox!)
+          (check-convert!)
+          (if script
+            (do
+              (run-script script run-sox)
+              (when (:watch options)
+                (println "Watching" script "for changes.")
+                (.watch node-fs script (fn [_ _]
+                                         (reset! stop-banner (BANNER!))
+                                         (run-script script run-sox)))))
+            (run-sox (sox {:channels 2 :depth 8} (drop 2 arguments)))))))))

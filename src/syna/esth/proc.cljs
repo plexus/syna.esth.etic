@@ -22,3 +22,7 @@
       :out (.-stdout process)
       :err (.-stderr process)
       :process process})))
+
+(defn cmd-sync! [cmd & [opts]]
+  (let [opts (clj->js (merge {:encoding "utf8"} opts))]
+    (.execSync node-child-process cmd opts)))

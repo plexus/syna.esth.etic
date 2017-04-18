@@ -19,12 +19,12 @@
 (defn source [s]
   (if s
     (-source s)
-    (throw (new js/Error (str "Can't use " s " as a pipe source.")))))
+    (throw (new js/Error (str "Can't use " (prn s) " as a pipe source.")))))
 
 (defn sink [s]
   (if s
     (-sink s)
-    (throw (new js/Error (str "Can't use " s " as a pipe sink.")))))
+    (throw (new js/Error (str "Can't use " (prn s) " as a pipe sink.")))))
 
 (defn pass-through-stream []
   (PassThrough.))
@@ -53,10 +53,14 @@
   (Readable.))
 
 (defn <file [file]
-  (.createReadStream node-fs file))
+  (if (= file "-")
+    js/process.stdin
+    (.createReadStream node-fs file)))
 
 (defn >file [file]
-  (.createWriteStream node-fs file))
+  (if (= file "-")
+    js/process.stdout
+    (.createWriteStream node-fs file)))
 
 (defn buffer-size [buffer]
   (.-length buffer))

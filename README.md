@@ -83,6 +83,10 @@ workflow.
 
 You can use `-` as a file name to either read from stdout, or write to stdout.
 
+## Hashtag
+
+Make sure to use the `#synaesthetic` hashtag when sharing your creations on social media!
+
 ## Author
 
 Plexus [Mastodon](https://toot.cat/@plexus) / [Patreon](http://www.patreon.com/plexus)

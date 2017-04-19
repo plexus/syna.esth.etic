@@ -73,7 +73,13 @@ automatically re-run the script automatically re-run the it whenever it changes.
 If your image viewer also auto-updates then this provides a really nice
 workflow.
 
-## Pipes
+## Command line switches
+
+* `-h` `--help` Show the help screen
+* `-s` `--script SCRIPT_FILE` The name of a ClojureScript script to run
+* `-w` `--watch` Don't exit but watch the script for changes and re-run. Use with `-s`.
+* `-H` `--header SIZE` Set the amount of bytes to preserve to not mess up the image header. Defaults to 512
+<!-- * `-t` `--image-type EXTENSION` Change the intermediate file type that gets fed through SoX. Defaults to "bmp". Doesn't do anything useful at the moment, because other formats will result in corrupted images. -->
 
 You can use `-` as a file name to either read from stdout, or write to stdout.
 

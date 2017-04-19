@@ -20,7 +20,7 @@
             [cljs.js :as cljs]
             [cljs.reader :refer [read-string]]))
 
-(def sox-dsl '[sox dcshift delay echos bass treble bandreject fir])
+(def sox-dsl '[sox dcshift delay echos bass treble bandreject fir reverb])
 
 (def *err* js/process.stderr)
 (def *in* js/process.stdin)
@@ -57,25 +57,10 @@
 ;;       (echos 0.7 0.8 250 0.4)
 ;;       #_(dcshift 0.2)))
 
-
-
-(def cli-options [["-h" "--help" "Show this help screen"]
-                  ["-s" "--script SCRIPT_FILE" "Use a sox script instead of passing options on the command line"]
-                  ["-w" "--watch" "Watch the script for changes"]])
-
-(def help
-  (str/join \newline (flatten ["Syna.esth.etic. Command Line Glitcher Extraordinaire"
-                               "Usage: synaesthetic [options] in-file out-file *sox-args"
-                               ""
-                               "Options:"
-                               (map #(str "\t" (str/join "\t" (take 3 %))) cli-options)
-                               ""
-                               "in-file and out-file can be - to read from stdin or write to stdout"])))
-
-(defn run-pipeline [infile outfile sox]
+(defn run-pipeline [infile outfile sox {:keys [header-size transfer-type output-type]}]
   (let [in            (<file infile)
-        img->bmp      (cmd! ["convert" "-" "bmp:-"])
-        bmp->png      (cmd! ["convert" "bmp:-" "png:-"])
+        img->bmp      (cmd! ["convert" "-" (str transfer-type ":-")])
+        bmp->png      (cmd! ["convert" (str transfer-type ":-") (str output-type ":-")])
         out           (>file outfile)]
 
     (| (:err img->bmp) *err*)
@@ -92,7 +77,7 @@
 
                        ;; chop off the header, the header needs to stay intact,
                        ;; with the rest you can mess as much as you like
-                       [head body] (split-stream bmp 1000)]
+                       [head body] (split-stream bmp header-size)]
 
                    ;; pipe the rest of the image to sox, this is where the *magic* happens
                    (| body sox)
@@ -140,25 +125,42 @@
     (catch js/Error e
       (println-err "FATAL: Failed to run convert. Make sure you have ImageMagick installed. Try running convert --version."))))
 
+(def cli-options [["-h" "--help" "Show this help screen"]
+                  ["-s" "--script SCRIPT_FILE" "The name of a ClojureScript script to run"]
+                  ["-w" "--watch" "Watch the script for changes"]
+                  ["-H" "--header SIZE" "Number of bytes at the start of the file to preserve, defaults to 512" :default 512]
+                  ["-t" "--image-type EXT" "Type of image to feed through SoX. Defaults to 'bmp'. (experimental)" :default "bmp"]])
+
+(def help
+  (str/join \newline (flatten ["Syna.esth.etic. Command Line Glitcher Extraordinaire"
+                               "Usage: synaesthetic [options] in-file out-file *sox-args"
+                               ""
+                               "Options:"
+                               (map #(str "\t" (str/join "\t" (take 3 %))) cli-options)
+                               ""
+                               "in-file and out-file can be - to read from stdin or write to stdout"])))
+
 (defn -main [& args]
-  (let [{:keys [options arguments]} (parse-opts args cli-options :in-order true)]
-    (if (or (:help options) (empty? arguments))
+  (let [{:keys [options arguments]} (parse-opts args cli-options :in-order true)
+        {:keys [help script watch header image-type]} options]
+    (if (or help (empty? arguments))
       (println-err help)
       (do
         (let [stop-banner (atom (BANNER!))
               infile (first arguments)
               outfile (second arguments)
-              script (:script options)
               run-sox (fn [sox-proc]
                         (.on (:out sox-proc) "end" @stop-banner)
                         (| (:err sox-proc) *err*)
-                        (run-pipeline infile outfile sox-proc))]
+                        (run-pipeline infile outfile sox-proc {:header-size (long header)
+                                                               :transfer-type image-type
+                                                               :output-type "png"}))]
           (check-sox!)
           (check-convert!)
           (if script
             (do
               (run-script script run-sox)
-              (when (:watch options)
+              (when watch
                 (println "Watching" script "for changes.")
                 (.watch node-fs script (fn [_ _]
                                          (reset! stop-banner (BANNER!))

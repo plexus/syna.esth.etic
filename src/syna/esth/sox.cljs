@@ -19,6 +19,7 @@
                     "-t" "raw" "-"
                     "-t" "raw" "-"]
                    args)]
+    (println (str/join " " cmd))
     (cmd! cmd)))
 
 (defn dcshift [shift]
@@ -41,3 +42,22 @@
 
 (defn fir [args]
   (cons "fir" args))
+
+(defn reverb "reverb [-w|--wet-only] [reverberance (50%) [HF-damping (50%)
+       [room-scale (100%) [stereo-depth (100%)
+       [pre-delay (0ms) [wet-gain (0dB)]]]]]]
+
+  Add  reverberation  to  the  audio using the `freeverb' algorithm.  A reverberation effect is sometimes desirable for concert halls that are too small or contain so many people that the hall's natural reverberance is diminished.  Applying a small amount of stereo reverb to a (dry) mono signal will usually make it sound more natural."
+  [& [{:keys [wet-only reverberance hf-damping room-scale
+              stereo-depth pre-delay wet-gain]
+       :or {wet-only false
+            reverberance 50
+            hf-damping 50
+            room-scale 100
+            stereo-depth 100
+            pre-delay 0
+            wet-gain 0}}]]
+  (into
+   (cond-> ["reverb"] wet-only (conj "--wet-only"))
+   [reverberance hf-damping room-scale
+    stereo-depth pre-delay wet-gain]))

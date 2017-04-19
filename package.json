@@ -1,6 +1,6 @@
 {
   "name": "synaesthetic",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Glitch images with sound effects",
   "bin": {
     "synaesthetic": "bin/synaesthetic"
